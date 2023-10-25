@@ -1,8 +1,6 @@
 // This script will download the preview images for all projects in the contentful CMS
 // and save them to the local filesystem
 
-import fs from 'fs';
-import fetch from 'node-fetch';
 import { CodeProjectCard, getCodeProjectCardsContent } from './api.js';
 import { downloadImage } from './download.js';
 
@@ -20,12 +18,15 @@ async function main() {
   // For each project, download the preview image
   for (const project of projectCardContent) {
     const previewImageUrl = project.preview.url;
+    const projectSlug = project.slug;
     const previewImageFilename = previewImageUrl.split('/').pop() as string;
+    const filePath = `./images/${projectSlug}/${previewImageFilename}`;
 
-    console.log(`Downloading ${previewImageUrl} to ${previewImageFilename}`);
+    // eslint-disable-next-line no-console
+    console.log(`Downloading ${previewImageUrl} to ${filePath}`);
 
     try {
-      downloadImage(previewImageUrl, previewImageFilename);
+      downloadImage(previewImageUrl, filePath);
     } catch (err) {
       console.error(`Error downloading ${previewImageUrl}`, err);
       process.exit(1);
