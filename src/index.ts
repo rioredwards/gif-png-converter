@@ -1,7 +1,9 @@
 // This script will download the preview images for all projects in the contentful CMS
 // and save them to the local filesystem
 
+import { unlink } from 'fs';
 import { getCodeProjectCardsContent } from './api.js';
+import { convertGifToPng } from './convert.js';
 import { downloadImage } from './download.js';
 
 async function main() {
@@ -19,17 +21,22 @@ async function main() {
     if (!previewImageUrl) continue;
 
     const previewImageFilename = previewImageUrl.split('/').pop() as string;
-    const filePath = `./gifs/${project.slug}/${previewImageFilename}`;
+    const filePath = `./images/${project.slug}/${previewImageFilename}`;
 
     console.log(`Downloading ${previewImageUrl} to ${filePath}`);
 
     try {
-      downloadImage(previewImageUrl, filePath);
+      await downloadImage(previewImageUrl, filePath);
       newImagePaths.push(filePath);
     } catch (err) {
       console.error(`Error downloading ${previewImageUrl}`, err);
       process.exit(1);
     }
+  }
+
+  // Convert the gifs at each filepath to .pngs using jimp
+  for (const filePath of newImagePaths) {
+    await convertGifToPng(filePath);
   }
 }
 

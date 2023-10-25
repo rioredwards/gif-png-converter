@@ -6,10 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.ts",
-    "start": "echo \"Error: no start specified\" && exit 1",
-    "downloadGifs": "ts-node-esm src/index.ts",
-    "convertGifsToImages": "ts-node-esm src/index.ts"
+    "start": "ts-node-esm src/index.ts",
+    "convert": "ts-node-esm src/convert.ts"
   },
   "keywords": [],
   "author": "",
