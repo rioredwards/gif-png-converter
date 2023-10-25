@@ -2,7 +2,8 @@
 // and save them to the local filesystem
 
 // Import the required modules
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
+
 dotenv.config();
 
 // Configure the environment variables
