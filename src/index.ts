@@ -24,9 +24,8 @@ async function main() {
       continue;
     }
 
-    const projectSlug = project.slug;
     const previewImageFilename = previewImageUrl.split('/').pop() as string;
-    const filePath = `./images/${projectSlug}/${previewImageFilename}`;
+    const filePath = `./gifs/${project.slug}/${previewImageFilename}`;
 
     // eslint-disable-next-line no-console
     console.log(`Downloading ${previewImageUrl} to ${filePath}`);
