@@ -18,6 +18,12 @@ async function main() {
   // For each project, download the preview image
   for (const project of projectCardContent) {
     const previewImageUrl = project.preview.url;
+    if (!previewImageUrl) {
+      // eslint-disable-next-line no-console
+      console.warn(`No preview image for project ${project.title}`);
+      continue;
+    }
+
     const projectSlug = project.slug;
     const previewImageFilename = previewImageUrl.split('/').pop() as string;
     const filePath = `./images/${projectSlug}/${previewImageFilename}`;
