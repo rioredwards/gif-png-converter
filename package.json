@@ -2,12 +2,11 @@
   "name": "gifprocessor",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node-esm src/index.ts",
-    "convert": "ts-node-esm src/convert.ts"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
