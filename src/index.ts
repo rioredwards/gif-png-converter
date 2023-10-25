@@ -1,12 +1,11 @@
 // This script will download the preview images for all projects in the contentful CMS
 // and save them to the local filesystem
 
-import { unlink } from 'fs';
 import { getCodeProjectCardsContent } from './api.js';
 import { convertGifToPng } from './convert.js';
 import { downloadImage } from './download.js';
 
-async function main() {
+export default async function main(baseDir: string) {
   // Fetch the project content from the contentful CMS
   const projectCardContent = await getCodeProjectCardsContent();
 
@@ -21,7 +20,7 @@ async function main() {
     if (!previewImageUrl) continue;
 
     const previewImageFilename = previewImageUrl.split('/').pop() as string;
-    const filePath = `./images/${project.slug}/${previewImageFilename}`;
+    const filePath = `${baseDir}/${project.slug}/${previewImageFilename}`;
 
     console.log(`Downloading ${previewImageUrl} to ${filePath}`);
 
@@ -39,5 +38,3 @@ async function main() {
     await convertGifToPng(filePath);
   }
 }
-
-main().catch((error) => console.error(error));
