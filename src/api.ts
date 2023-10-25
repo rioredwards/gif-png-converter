@@ -55,8 +55,11 @@ async function fetchGraphQL(query: string): Promise<any> {
 }
 
 export async function getCodeProjectCardsContent(): Promise<CodeProjectCard[]> {
-  const entries = await fetchGraphQL(
-    `query {
+  let entries: any[] = [];
+
+  try {
+    const unprocessedEntries = await fetchGraphQL(
+      `query {
       featuredCodeProjectCollection(
         order: sys_publishedAt_DESC,
       ) {
@@ -65,6 +68,12 @@ export async function getCodeProjectCardsContent(): Promise<CodeProjectCard[]> {
         }
       }
     }`
-  );
-  return extractCodeProjectCardEntries(entries);
+    );
+    entries = extractCodeProjectCardEntries(unprocessedEntries);
+  } catch (err) {
+    console.error('Error fetching project content from contentful CMS', err);
+    process.exit(1);
+  }
+
+  return entries;
 }

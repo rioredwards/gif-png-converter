@@ -1,37 +1,31 @@
 // This script will download the preview images for all projects in the contentful CMS
 // and save them to the local filesystem
 
-import { CodeProjectCard, getCodeProjectCardsContent } from './api.js';
+import { getCodeProjectCardsContent } from './api.js';
 import { downloadImage } from './download.js';
 
 async function main() {
-  let projectCardContent: CodeProjectCard[] = [];
+  // Fetch the project content from the contentful CMS
+  const projectCardContent = await getCodeProjectCardsContent();
 
-  // Fetch all projects from the contentful CMS
-  try {
-    projectCardContent = await getCodeProjectCardsContent();
-  } catch (err) {
-    console.error('Error fetching project content from contentful CMS', err);
-    process.exit(1);
-  }
+  // Store the paths to the downloaded images
+  const newImagePaths: string[] = [];
 
   // For each project, download the preview image
   for (const project of projectCardContent) {
     const previewImageUrl = project.preview.url;
-    if (!previewImageUrl) {
-      // eslint-disable-next-line no-console
-      console.warn(`No preview image for project ${project.title}`);
-      continue;
-    }
+
+    // Skip projects without a preview image
+    if (!previewImageUrl) continue;
 
     const previewImageFilename = previewImageUrl.split('/').pop() as string;
     const filePath = `./gifs/${project.slug}/${previewImageFilename}`;
 
-    // eslint-disable-next-line no-console
     console.log(`Downloading ${previewImageUrl} to ${filePath}`);
 
     try {
       downloadImage(previewImageUrl, filePath);
+      newImagePaths.push(filePath);
     } catch (err) {
       console.error(`Error downloading ${previewImageUrl}`, err);
       process.exit(1);
