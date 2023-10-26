@@ -1,40 +1,34 @@
-// This script will download the preview images for all projects in the contentful CMS
-// and save them to the local filesystem
+import Jimp from 'jimp';
+import axios from 'axios';
 
-import { getCodeProjectCardsContent } from './api.js';
-import { convertGifToPng } from './convert.js';
-import { downloadImage } from './download.js';
+export default async function convertGifToPng(gifUrl: string, outputDir: string) {
+  try {
+    const gifName = gifUrl.split('/').pop();
+    if (!gifName) throw new Error('Gif name is undefined. The url may be malformed.');
 
-export default async function main(baseDir: string) {
-  // Fetch the project content from the contentful CMS
-  const projectCardContent = await getCodeProjectCardsContent();
-
-  // Store the paths to the downloaded images
-  const newImagePaths: string[] = [];
-
-  // For each project, download the preview image
-  for (const project of projectCardContent) {
-    const previewImageUrl = project.preview.url;
-
-    // Skip projects without a preview image
-    if (!previewImageUrl) continue;
-
-    const previewImageFilename = previewImageUrl.split('/').pop() as string;
-    const filePath = `${baseDir}/${project.slug}/${previewImageFilename}`;
-
-    console.log(`Downloading ${previewImageUrl} to ${filePath}`);
-
-    try {
-      await downloadImage(previewImageUrl, filePath);
-      newImagePaths.push(filePath);
-    } catch (err) {
-      console.error(`Error downloading ${previewImageUrl}`, err);
-      process.exit(1);
+    // If the gifName ends in .gif, replace .gif with .png
+    // Otherwise, just append .png
+    let pngName: string;
+    if (gifName.endsWith('.gif')) {
+      pngName = gifName?.replace('.gif', '.png');
+    } else {
+      pngName = `${gifName}.png`;
     }
-  }
 
-  // Convert the gifs at each filepath to .pngs using jimp
-  for (const filePath of newImagePaths) {
-    await convertGifToPng(filePath);
+    const outputFilePath = `${outputDir}/${pngName}`;
+
+    // Get the gif as a buffer
+    const response = await axios.get(gifUrl, { responseType: 'arraybuffer' });
+    const buffer = Buffer.from(response.data, 'binary');
+
+    // Convert the gif to a png
+    const image = await Jimp.read(buffer);
+
+    // Write the image to a file
+    await image.writeAsync(outputFilePath);
+    return outputFilePath;
+  } catch (err) {
+    console.error(`Error converting ${gifUrl} to png`, err);
+    throw err;
   }
 }
